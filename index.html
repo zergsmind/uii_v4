@@ -526,6 +526,63 @@
     .fade-up:nth-child(2) { transition-delay: 0.1s; }
     .fade-up:nth-child(3) { transition-delay: 0.2s; }
 
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+
+      /* Nav — hide links, keep logo */
+      .nav-links { display: none; }
+
+      nav { padding: 1.2rem 5vw; }
+
+      /* Hero */
+      #hero { padding: 0 5vw 8vh; }
+      .hero-h1 { font-size: clamp(2.2rem, 8vw, 3rem); max-width: 100%; }
+      .hero-sub { max-width: 100%; }
+
+      /* Section inner — reduce vertical padding */
+      .section-inner { padding: 5rem 5vw; }
+
+      /* Ce Suntem — single column */
+      .ce-suntem-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .ce-suntem-sticky { position: static; }
+
+      /* Cum Lucrăm — stack header, single column cards */
+      .cum-header {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .cards { grid-template-columns: 1fr; }
+
+      /* Track Record — 2x2 grid */
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .stat-item + .stat-item {
+        border-left: none;
+        padding-left: 0;
+      }
+      .stat-item:nth-child(3),
+      .stat-item:nth-child(4) { border-top: 1px solid rgba(255,255,255,0.15); }
+
+      /* Doctrina */
+      #doctrina .section-inner { padding: 5rem 5vw; }
+      #doctrina blockquote { font-size: clamp(1.2rem, 4.5vw, 1.6rem); }
+
+      /* Contact — single column */
+      #contact .section-inner {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+      }
+
+      /* Footer */
+      .footer-meta { text-align: left; font-size: 0.65rem; }
+
+    }
+
   </style>
 </head>
 <body>
