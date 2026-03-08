@@ -49,6 +49,8 @@
       justify-content: space-between;
       align-items: center;
       transition: background 0.4s, box-shadow 0.4s;
+      opacity: 0;
+      pointer-events: none;
     }
 
     nav.scrolled {
@@ -931,20 +933,36 @@
   let c3Offset   = 0;
   let c3Target   = 0;
 
-  window.addEventListener('wheel', (e) => {
+  // Shared handler — called by both wheel and touch
+  function applyScrollImpulse(deltaY) {
     const prev = wheelImpulse;
-    wheelImpulse += Math.abs(e.deltaY) * 0.000012;
-    // Generate a fresh cluster map when scrolling starts or periodically while active
+    wheelImpulse += Math.abs(deltaY) * 0.000012;
     if (prev < 0.005 || regenTimer > 25) { generateConnections(); regenTimer = 0; }
-    // Signed: scroll down opens crack, scroll up closes it
-    crackTarget = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackTarget + e.deltaY * 0.18));
-    // crack3: if #contact is visible, any wheel input seals it shut
+    crackTarget = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackTarget + deltaY * 0.18));
     const contactEl = document.getElementById('contact');
     if (contactEl && contactEl.getBoundingClientRect().top < window.innerHeight) {
-      c3Target = Math.max(CRACK_MIN, c3Target - Math.abs(e.deltaY) * 0.28);
+      c3Target = Math.max(CRACK_MIN, c3Target - Math.abs(deltaY) * 0.28);
     } else {
-      c3Target = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Target + e.deltaY * 0.18));
+      c3Target = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Target + deltaY * 0.18));
     }
+  }
+
+  window.addEventListener('wheel', (e) => {
+    applyScrollImpulse(e.deltaY);
+  }, { passive: true });
+
+  // ─── TOUCH — drive same effects on mobile swipe ───
+  let touchStartY = 0;
+  let touchLastY  = 0;
+  window.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+    touchLastY  = touchStartY;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    const y     = e.touches[0].clientY;
+    const delta = (touchLastY - y) * 2.2; // invert: swipe up = scroll down
+    touchLastY  = y;
+    applyScrollImpulse(delta);
   }, { passive: true });
 
   window.addEventListener('scroll', () => {
