@@ -398,10 +398,8 @@
 
     #doctrina .section-inner {
       padding: 9rem 6vw;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 6rem;
-      align-items: center;
+      max-width: 820px;
+      margin: 0 auto;
     }
 
     #doctrina .section-label { color: var(--coral-light); }
@@ -561,7 +559,6 @@
       <div class="ce-suntem-sticky fade-up">
         <span class="section-label">Ce suntem</span>
         <h2>Structura neutră<br>la intersecția<br>tuturor actorilor.</h2>
-        <p style="font-size:0.85rem; color:rgba(247,244,239,0.35); margin-top:0.5rem;">București, România · Înregistrată ca fundație independentă</p>
       </div>
       <div>
         <p class="fade-up">Urban Innovation Institute (UII) este o fundație independentă înregistrată în România, construită ca infrastructură de integrare sistemică pentru inovare urbană. Conectăm administrație publică, sector privat, academie, societate civilă și comunități — prin procese standardizate de co-design, diagnostic bazat pe date și mobilizare de capital strategic.</p>
@@ -579,6 +576,9 @@
     </div>
   </div>
 </section>
+
+<!-- ─── CRACK ─── -->
+<div id="crack" style="height:120px; position:relative; z-index:1;"></div>
 
 <!-- ─── CUM LUCRĂM ─── -->
 <section id="cum-lucram">
@@ -655,18 +655,20 @@
   </div>
 </section>
 
+<!-- ─── CRACK 2 ─── -->
+<div id="crack2" style="height:120px; position:relative; z-index:1;"></div>
+
 <!-- ─── DOCTRINA ─── -->
 <section id="doctrina">
   <div class="section-inner">
-    <div class="fade-up">
-      <span class="section-label">Doctrina în o singură frază</span>
-      <p class="doctrine-label">Poziționarea UII</p>
-    </div>
     <blockquote class="fade-up">
       Nu competăm cu consultanțele, cu ONG-urile sau cu administrația publică. Competăm cu <em>absența unui mecanism de integrare</em>. Și în acel spațiu, nu avem competiție.
     </blockquote>
   </div>
 </section>
+
+<!-- ─── CRACK 3 ─── -->
+<div id="crack3" style="height:120px; position:relative; z-index:1;"></div>
 
 <!-- ─── CONTACT ─── -->
 <section id="contact">
@@ -692,10 +694,8 @@
 <!-- ─── FOOTER ─── -->
 <footer>
   <div class="footer-inner">
-    <span class="footer-logo">Urban Innovation Institute</span>
     <div class="footer-meta">
-      contact@urbaninnovationinstitute.ro<br>
-      București, România · Februarie 2026
+      © 2026 Urban Innovation Institute Association | Tax ID 52883389 |
     </div>
   </div>
 </footer>
@@ -792,7 +792,7 @@
   scene.add(logo);
 
   // ─── PARTICLES ───
-  const COUNT = 900;
+  const COUNT = 1170;
   const pos = new Float32Array(COUNT * 3);
   const vel = new Float32Array(COUNT * 2);
   const SX = 22, SY = 13;
@@ -813,17 +813,102 @@
   });
   scene.add(new THREE.Points(pGeo, pMat));
 
+  // ─── CONSTELLATION LINES ───
+  const MAX_LINES = 700;
+  const linePos   = new Float32Array(MAX_LINES * 6); // 2 pts × 3 coords
+  const lineGeo   = new THREE.BufferGeometry();
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+  lineGeo.setDrawRange(0, 0);
+  const lineMat = new THREE.LineBasicMaterial({ color: DARK_P, transparent: true, opacity: 0 });
+  const lineSegs = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lineSegs);
+
+  let connectionPairs = [];
+  let regenTimer = 0;
+
+  function generateConnections() {
+    connectionPairs = [];
+    const SAMPLE = 130;
+    const DIST   = 2.2;  // world-unit distance threshold
+    const MAX_PER = 3;
+
+    // Pick random sample of particle indices
+    const sample = Array.from({ length: SAMPLE }, () => Math.floor(Math.random() * COUNT));
+
+    for (let a = 0; a < sample.length && connectionPairs.length < MAX_LINES; a++) {
+      const ia = sample[a];
+      const ax = pos[ia*3], ay = pos[ia*3+1];
+      const near = [];
+      for (let b = 0; b < sample.length; b++) {
+        if (b === a) continue;
+        const ib = sample[b];
+        const dx = pos[ib*3] - ax, dy = pos[ib*3+1] - ay;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < DIST) near.push({ ib, d });
+      }
+      near.sort((x, y) => x.d - y.d);
+      for (let k = 0; k < Math.min(MAX_PER, near.length); k++) {
+        if (connectionPairs.length < MAX_LINES) connectionPairs.push([ia, near[k].ib]);
+      }
+    }
+  }
+
   // ─── SCROLL-DRIVEN ANIMATION ───
   let autoRot    = 0;
   let currentRot = 0;
   let targetRot  = 0;
   let canvasOpacity = 1;
+  let wheelImpulse = 0;
+
+  // ─── CRACK SPRING ───
+  const CRACK_REST   = 120;  // px
+  const CRACK_MAX    = 100;  // px max expansion
+  const CRACK_MIN    = -120; // px min (fully closed)
+  const crackIds     = ['crack', 'crack2'];
+  let crackVelocity  = 0;
+  let crackOffset    = 0;
+  let crackTarget    = 0;
+
+  // crack3 has its own spring — seals shut when #contact is in view
+  let c3Velocity = 0;
+  let c3Offset   = 0;
+  let c3Target   = 0;
+
+  window.addEventListener('wheel', (e) => {
+    const prev = wheelImpulse;
+    wheelImpulse += Math.abs(e.deltaY) * 0.000012;
+    // Generate a fresh cluster map when scrolling starts or periodically while active
+    if (prev < 0.005 || regenTimer > 25) { generateConnections(); regenTimer = 0; }
+    // Signed: scroll down opens crack, scroll up closes it
+    crackTarget = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackTarget + e.deltaY * 0.18));
+    // crack3: if #contact is visible, any wheel input seals it shut
+    const contactEl = document.getElementById('contact');
+    if (contactEl && contactEl.getBoundingClientRect().top < window.innerHeight) {
+      c3Target = Math.max(CRACK_MIN, c3Target - Math.abs(e.deltaY) * 0.28);
+    } else {
+      c3Target = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Target + e.deltaY * 0.18));
+    }
+  }, { passive: true });
 
   window.addEventListener('scroll', () => {
     const heroH = window.innerHeight;
     const sy    = window.scrollY;
     targetRot   = (sy / heroH) * Math.PI * 1.8;
-    canvasOpacity = Math.max(0, 1 - sy / heroH * 1.4);
+
+    // Base fade: 0 by the time hero is scrolled past
+    const heroFade = Math.max(0, 1 - sy / heroH * 1.4);
+
+    // Crack peek: restore opacity when any crack gap is in the viewport
+    function crackPeek(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const r = el.getBoundingClientRect();
+      const dist = Math.abs((r.top + r.height / 2) - heroH / 2);
+      return Math.max(0, 1 - dist / (heroH * 0.55));
+    }
+    const crackPeak = Math.max(crackPeek('crack'), crackPeek('crack2'), crackPeek('crack3'));
+
+    canvasOpacity = Math.max(heroFade, crackPeak * 0.85);
     document.getElementById('webgl').style.opacity = canvasOpacity;
 
     // Nav style
@@ -848,7 +933,41 @@
     const s = Math.max(0.85, Math.min(1.5, 1 + currentRot * 0.12));
     logo.scale.setScalar(s);
 
+    wheelImpulse *= 0.90;
+    if (wheelImpulse > 0.001) regenTimer++;
+
+    // ─── CRACK SPRING ───
+    // shared crack spring (crack, crack2)
+    crackTarget  *= 0.88;
+    const spring  = (crackTarget - crackOffset) * 0.09;
+    const damper  = crackVelocity * 0.72;
+    crackVelocity = crackVelocity + spring - damper;
+    crackOffset   = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackOffset + crackVelocity));
+    const crackH  = Math.max(0, Math.round(CRACK_REST + crackOffset)) + 'px';
+    for (const id of crackIds) {
+      const el = document.getElementById(id);
+      if (el) el.style.height = crackH;
+    }
+
+    // crack3 spring — seals shut when #contact is reached
+    const contactVisible = (() => {
+      const el = document.getElementById('contact');
+      return el && el.getBoundingClientRect().top < window.innerHeight;
+    })();
+    c3Target *= contactVisible ? 0.94 : 0.88; // slower decay when sealing (stays closed longer)
+    const s3 = (c3Target - c3Offset) * 0.09;
+    const d3 = c3Velocity * 0.72;
+    c3Velocity = c3Velocity + s3 - d3;
+    c3Offset   = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Offset + c3Velocity));
+    const c3H  = document.getElementById('crack3');
+    if (c3H) c3H.style.height = Math.max(0, Math.round(CRACK_REST + c3Offset)) + 'px';
+
+    const cap = 0.018;
     for (let i = 0; i < COUNT; i++) {
+      vel[i*2]   += (Math.random() - 0.5) * wheelImpulse;
+      vel[i*2+1] += (Math.random() - 0.5) * wheelImpulse;
+      vel[i*2]    = Math.max(-cap, Math.min(cap, vel[i*2]));
+      vel[i*2+1]  = Math.max(-cap, Math.min(cap, vel[i*2+1]));
       pos[i*3]   += vel[i*2];
       pos[i*3+1] += vel[i*2+1];
       if (pos[i*3]   >  SX/2) pos[i*3]   = -SX/2;
@@ -857,6 +976,23 @@
       if (pos[i*3+1] < -SY/2) pos[i*3+1] =  SY/2;
     }
     pGeo.attributes.position.needsUpdate = true;
+
+    // Update constellation lines
+    const lineOpacity = Math.min(1, wheelImpulse * 120) * 0.38;
+    lineMat.opacity = lineMat.opacity + (lineOpacity - lineMat.opacity) * 0.12;
+    if (lineMat.opacity > 0.005 && connectionPairs.length > 0) {
+      let lc = 0;
+      for (const [ia, ib] of connectionPairs) {
+        if (lc >= MAX_LINES) break;
+        linePos[lc*6]   = pos[ia*3];   linePos[lc*6+1] = pos[ia*3+1]; linePos[lc*6+2] = pos[ia*3+2];
+        linePos[lc*6+3] = pos[ib*3];   linePos[lc*6+4] = pos[ib*3+1]; linePos[lc*6+5] = pos[ib*3+2];
+        lc++;
+      }
+      lineGeo.setDrawRange(0, lc * 2);
+      lineGeo.attributes.position.needsUpdate = true;
+    } else {
+      lineGeo.setDrawRange(0, 0);
+    }
 
     renderer.render(scene, camera);
   }
