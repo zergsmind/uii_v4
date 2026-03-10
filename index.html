@@ -3,73 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Urban Innovation Institute</title>
+  <title>UII — Experiment Avax Concept</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
   <style>
     :root {
       --teal:         #1B5E5A;
       --teal-light:   #2A7C76;
+      --teal-bright:  #3DB5AD;
       --coral:        #D4613A;
       --coral-light:  #F2845F;
       --offwhite:     #F7F4EF;
-      --cream:        #F0EDE6;
-      --dark:         #1A1A18;
-      --mid:          #4A4A48;
-      --light:        #9A9A96;
+      --dark:         #0A0A0A;
+      --surface:      #111111;
+      --surface-2:    #1A1A1A;
+      --border:       rgba(255,255,255,0.08);
+      --text:         rgba(255,255,255,0.9);
+      --text-muted:   rgba(255,255,255,0.45);
+      --text-dim:     rgba(255,255,255,0.2);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--offwhite);
-      color: var(--dark);
+      background: var(--dark);
+      color: var(--text);
       overflow-x: hidden;
     }
 
-    /* ─── CANVAS ─── */
-    canvas#webgl {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+    /* ── GRADIENT MESH ── */
+    .mesh-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
       z-index: 0;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0;
+      animation: blobFadeIn 2s forwards;
+    }
+
+    .blob-1 {
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(27,94,90,0.45), transparent 70%);
+      top: -200px; left: -120px;
+      animation: blobFadeIn 2s 0.2s forwards, blobMove1 22s 2s ease-in-out infinite;
+    }
+
+    .blob-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(61,181,173,0.18), transparent 70%);
+      top: 80px; right: -80px;
+      animation: blobFadeIn 2s 0.5s forwards, blobMove2 28s 2s ease-in-out infinite;
+    }
+
+    .blob-3 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(212,97,58,0.12), transparent 70%);
+      bottom: 80px; left: 35%;
+      animation: blobFadeIn 2s 0.8s forwards, blobMove3 20s 2s ease-in-out infinite;
+    }
+
+    @keyframes blobFadeIn { to { opacity: 1; } }
+
+    @keyframes blobMove1 {
+      0%, 100% { transform: translate(0, 0); }
+      33%       { transform: translate(90px, 70px); }
+      66%       { transform: translate(-50px, 110px); }
+    }
+
+    @keyframes blobMove2 {
+      0%, 100% { transform: translate(0, 0); }
+      33%       { transform: translate(-70px, 90px); }
+      66%       { transform: translate(50px, -70px); }
+    }
+
+    @keyframes blobMove3 {
+      0%, 100% { transform: translate(0, 0); }
+      50%       { transform: translate(-90px, -50px); }
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 64px 64px;
+      z-index: 1;
       pointer-events: none;
     }
 
-    /* ─── NAV ─── */
+    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 1.4rem 6vw;
+      z-index: 1000;
+      padding: 1.2rem 6vw;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: background 0.4s, box-shadow 0.4s;
-      opacity: 0;
-      pointer-events: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.4s, background 0.4s;
     }
 
     nav.scrolled {
-      background: rgba(26,26,24,0.96);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom-color: var(--border);
     }
 
     .nav-logo {
-      font-family: 'Spectral', serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--dark);
-      letter-spacing: 0.04em;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: white;
       text-decoration: none;
-      transition: color 0.3s;
     }
 
-    nav.scrolled .nav-logo { color: white; }
+    .nav-logo span { color: var(--coral); }
 
     .nav-links {
       display: flex;
@@ -82,1032 +141,993 @@
       font-weight: 400;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--mid);
+      color: var(--text-muted);
       text-decoration: none;
       transition: color 0.2s;
     }
 
-    .nav-links a:hover { color: var(--teal); }
+    .nav-links a:hover { color: white; }
 
-    nav.scrolled .nav-links a { color: rgba(255,255,255,0.55); }
-    nav.scrolled .nav-links a:hover { color: var(--coral-light); }
+    .nav-cta {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--coral);
+      padding: 0.55rem 1.3rem;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
 
-    /* ─── HERO ─── */
+    .nav-cta:hover {
+      background: var(--coral-light);
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
     #hero {
       position: relative;
-      height: 100vh;
-      z-index: 1;
-      background: transparent;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 0 6vw 7vh;
+      padding: 0 6vw 9vh;
     }
 
-    .hero-eyebrow {
-      font-size: 0.68rem;
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+    }
+
+    .hero-label {
+      font-size: 0.65rem;
       font-weight: 500;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
       color: var(--coral);
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s forwards;
     }
 
-    .hero-h1 {
-      font-family: 'Spectral', serif;
-      font-size: clamp(2.6rem, 5.5vw, 5rem);
-      font-weight: 300;
-      color: var(--dark);
-      line-height: 1.07;
-      max-width: 680px;
-      margin-bottom: 1.6rem;
+    .hero-label::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--coral);
+    }
+
+    h1 {
+      font-size: clamp(3rem, 6.5vw, 6.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.025em;
+      color: white;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.5s forwards;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--teal-bright);
     }
 
     .hero-sub {
-      font-size: 0.92rem;
+      font-size: 1.05rem;
       font-weight: 300;
-      color: var(--mid);
-      max-width: 440px;
-      line-height: 1.75;
-      letter-spacing: 0.01em;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.7s forwards;
     }
 
-    .hero-cta {
-      margin-top: 2.5rem;
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.9s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-block;
+      background: var(--coral);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.1rem;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--coral-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
       display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
-      font-size: 0.72rem;
+      gap: 0.55rem;
+      font-size: 0.75rem;
       font-weight: 500;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--teal);
+      color: var(--text-muted);
       text-decoration: none;
-      transition: gap 0.2s;
+      transition: color 0.2s, gap 0.2s;
     }
 
-    .hero-cta::after {
-      content: '→';
-      font-size: 1rem;
-      transition: transform 0.2s;
+    .btn-ghost::after { content: '→'; transition: transform 0.2s; }
+    .btn-ghost:hover { color: white; gap: 0.85rem; }
+    .btn-ghost:hover::after { transform: translateX(2px); }
+
+    /* ── STATS STRIP ── */
+    #stats {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
     }
 
-    .hero-cta:hover { gap: 1.1rem; }
-    .hero-cta:hover::after { transform: translateX(3px); }
-
-    .scroll-line {
-      position: absolute;
-      bottom: 0;
-      left: 6vw;
-      width: 1px;
-      height: 56px;
-      background: linear-gradient(to bottom, var(--light), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
+    .stats-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3.5rem 6vw;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
     }
 
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
+    .stat-item {
+      padding: 0 2.5rem;
+      border-right: 1px solid var(--border);
     }
 
-    /* ─── SHARED SECTION ─── */
-    section {
-      position: relative;
-      z-index: 2;
+    .stat-item:first-child { padding-left: 0; }
+    .stat-item:last-child  { border-right: none; }
+
+    .stat-number {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: white;
+      line-height: 1;
+      margin-bottom: 0.55rem;
+      font-variant-numeric: tabular-nums;
     }
 
-    .section-inner {
-      max-width: 1100px;
+    .stat-number .accent { color: var(--coral); }
+
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── SECTION SHARED ── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-index {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .section-title em {
+      font-style: normal;
+      color: var(--teal-bright);
+    }
+
+    .section-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      max-width: 300px;
+      line-height: 1.8;
+      text-align: right;
+    }
+
+    /* ── WHY UII ── */
+    #why {
+      max-width: 1200px;
       margin: 0 auto;
       padding: 8rem 6vw;
     }
 
-    .section-label {
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--coral);
-      margin-bottom: 1.4rem;
-      display: block;
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
     }
 
-    h2 {
-      font-family: 'Spectral', serif;
-      font-size: clamp(1.9rem, 3vw, 2.8rem);
-      font-weight: 300;
-      line-height: 1.15;
-      margin-bottom: 2.5rem;
-    }
-
-    /* ─── CE SUNTEM ─── */
-    #ce-suntem {
+    .why-card {
       background: var(--dark);
-      color: var(--offwhite);
+      padding: 2.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
     }
 
-    #ce-suntem .section-label { color: var(--coral-light); }
-    #ce-suntem h2 { color: white; }
-
-    .ce-suntem-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr;
-      gap: 7rem;
-      align-items: start;
+    .why-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 0;
+      background: var(--coral);
+      transition: height 0.4s cubic-bezier(0.4,0,0.2,1);
     }
 
-    .ce-suntem-sticky {
-      position: sticky;
-      top: 6rem;
-    }
-
-    #ce-suntem p {
-      font-size: 0.97rem;
-      font-weight: 300;
-      line-height: 1.85;
-      color: rgba(247,244,239,0.65);
-      margin-bottom: 1.3rem;
-    }
-
-    .not-list {
-      margin: 2.5rem 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .not-item {
-      display: flex;
-      align-items: baseline;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      font-size: 0.88rem;
-      font-weight: 300;
-      color: rgba(247,244,239,0.45);
-      line-height: 1.5;
-    }
-
-    .not-item::before {
-      content: '—';
-      color: var(--coral);
-      flex-shrink: 0;
-      font-size: 0.7rem;
-    }
-
-    .quote-block {
-      margin-top: 2.5rem;
-      padding: 2.2rem 2.5rem;
-      border-left: 2px solid var(--coral);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .quote-block p {
-      font-family: 'Spectral', serif;
-      font-size: 1.15rem;
-      font-weight: 300;
-      font-style: italic;
-      color: white !important;
-      line-height: 1.65;
-      margin: 0;
-    }
-
-    /* ─── CUM LUCRĂM ─── */
-    #cum-lucram { background: var(--offwhite); }
-
-    .cum-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: end;
-      margin-bottom: 4rem;
-    }
-
-    .cum-intro {
-      font-size: 0.95rem;
-      font-weight: 300;
-      line-height: 1.8;
-      color: var(--mid);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5px;
-      background: var(--cream);
-    }
-
-    .service-card {
-      padding: 3rem 2.5rem 2.5rem;
-      background: var(--offwhite);
-      display: flex;
-      flex-direction: column;
-    }
+    .why-card:hover { background: var(--surface); }
+    .why-card:hover::before { height: 100%; }
 
     .card-num {
-      font-family: 'Spectral', serif;
-      font-size: 3rem;
-      font-weight: 300;
-      color: var(--teal);
-      opacity: 0.2;
-      line-height: 1;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
       margin-bottom: 2rem;
-      display: block;
+      font-variant-numeric: tabular-nums;
     }
 
-    .service-card h3 {
-      font-family: 'Spectral', serif;
+    .card-title {
       font-size: 1.1rem;
-      font-weight: 400;
-      color: var(--dark);
-      line-height: 1.35;
-      margin-bottom: 1.2rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.01em;
     }
 
-    .service-card p {
-      font-size: 0.87rem;
+    .card-text {
+      font-size: 0.875rem;
       font-weight: 300;
+      color: var(--text-muted);
       line-height: 1.8;
-      color: var(--mid);
+    }
+
+    /* ── PROGRAMS ── */
+    #programs {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .programs-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8rem 6vw;
+    }
+
+    .programs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 4rem;
+    }
+
+    .program-card {
+      background: var(--surface);
+      padding: 2rem 2.5rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: background 0.3s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .program-card:hover { background: var(--surface-2); }
+
+    .program-icon {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .program-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--teal-bright);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .program-tag {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--coral);
+    }
+
+    .program-name {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.01em;
+    }
+
+    .program-desc {
+      font-size: 0.825rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
       flex: 1;
     }
 
-    .tags {
-      margin-top: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .tag {
-      font-size: 0.6rem;
+    .program-arrow {
+      font-size: 0.68rem;
       font-weight: 500;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      background: var(--cream);
-      color: var(--teal);
-      border-radius: 1px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      transition: color 0.2s, gap 0.2s;
     }
 
-    /* ─── TRACK RECORD ─── */
-    #track-record {
-      background: var(--teal);
-      color: white;
-    }
-
-    #track-record .section-label { color: rgba(255,255,255,0.4); }
-    #track-record h2 { color: white; margin-bottom: 4.5rem; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-
-    .stat-item {
-      padding: 2.5rem 3rem 2.5rem 0;
-      border-top: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .stat-item + .stat-item {
-      padding-left: 3rem;
-      border-left: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .stat-num {
-      font-family: 'Spectral', serif;
-      font-size: clamp(2.8rem, 4vw, 4.5rem);
-      font-weight: 300;
-      color: white;
-      display: block;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      font-weight: 300;
-      color: rgba(255,255,255,0.55);
-      line-height: 1.6;
-      max-width: 180px;
-    }
-
-    /* ─── DOCTRINA ─── */
-    #doctrina {
-      background: var(--dark);
-    }
-
-    #doctrina .section-inner {
-      padding: 9rem 6vw;
-      max-width: 820px;
-      margin: 0 auto;
-    }
-
-    #doctrina .section-label { color: var(--coral-light); }
-
-    #doctrina .doctrine-label {
-      font-family: 'Spectral', serif;
-      font-size: 1rem;
-      font-weight: 300;
-      color: rgba(247,244,239,0.35);
-      line-height: 1.5;
-    }
-
-    #doctrina blockquote {
-      font-family: 'Spectral', serif;
-      font-size: clamp(1.3rem, 2vw, 1.9rem);
-      font-weight: 300;
-      font-style: italic;
-      color: white;
-      line-height: 1.55;
-    }
-
-    #doctrina blockquote em {
+    .program-card:hover .program-arrow {
       color: var(--coral-light);
+      gap: 0.75rem;
+    }
+
+    /* ── MANIFESTO ── */
+    #manifesto {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10rem 6vw;
+    }
+
+    .manifesto-text {
+      font-size: clamp(1.8rem, 3.8vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      color: var(--text-muted);
+      max-width: 920px;
+    }
+
+    .manifesto-text strong {
+      color: white;
+      font-weight: 600;
+    }
+
+    .manifesto-text em {
       font-style: normal;
+      color: var(--teal-bright);
     }
 
-    /* ─── CONTACT ─── */
-    #contact {
-      background: var(--offwhite);
+    .manifesto-rule {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 4rem 0;
     }
 
-    #contact .section-inner {
-      padding-top: 6rem;
-      padding-bottom: 6rem;
+    .manifesto-sub {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6rem;
+      gap: 6vw;
+      align-items: start;
+    }
+
+    .manifesto-sub-text {
+      font-size: 0.92rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.85;
+    }
+
+    .manifesto-cta-block {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    /* ── PARTNERS ── */
+    #partners {
+      border-top: 1px solid var(--border);
+    }
+
+    .partners-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 6vw;
+    }
+
+    .partners-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .partners-strip {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .partner-name {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      transition: color 0.2s;
+    }
+
+    .partner-name:hover { color: var(--text-muted); }
+
+    /* ── CTA BAND ── */
+    #cta-band {
+      background: var(--teal);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .cta-band-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6rem 6vw;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4rem;
       align-items: center;
     }
 
-    .contact-heading {
-      font-family: 'Spectral', serif;
-      font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-      font-weight: 300;
-      color: var(--dark);
+    .cta-band-title {
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.02em;
       line-height: 1.2;
-      margin-bottom: 0;
     }
 
-    .contact-details {
+    .cta-band-title span { color: var(--coral-light); }
+
+    .cta-band-actions {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
+      align-items: flex-start;
     }
 
-    .contact-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .contact-row .label {
-      font-size: 0.62rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
+    .btn-white {
+      display: inline-block;
+      background: white;
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--light);
-    }
-
-    .contact-row a,
-    .contact-row span {
-      font-size: 0.95rem;
-      font-weight: 300;
-      color: var(--dark);
+      padding: 0.9rem 2.1rem;
       text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
     }
 
-    .contact-row a:hover { color: var(--teal); }
+    .btn-white:hover {
+      background: var(--offwhite);
+      transform: translateY(-2px);
+    }
 
-    /* ─── FOOTER ─── */
+    .btn-outline-white {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: color 0.2s, gap 0.2s;
+    }
+
+    .btn-outline-white::after { content: '→'; }
+    .btn-outline-white:hover { color: white; gap: 0.8rem; }
+
+    /* ── FOOTER ── */
     footer {
-      background: var(--dark);
-      position: relative;
-      z-index: 2;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
     }
 
     .footer-inner {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 2rem 6vw;
+      padding: 5rem 6vw 3rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-brand-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand-name span { color: var(--coral); }
+
+    .footer-tagline {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+
+    .footer-col-title {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-links a {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: white; }
+
+    .footer-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid rgba(255,255,255,0.07);
     }
 
-    .footer-logo {
-      font-family: 'Spectral', serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: white;
+    .footer-copy {
+      font-size: 0.68rem;
       letter-spacing: 0.05em;
+      color: var(--text-dim);
     }
 
-    .footer-meta {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.3);
-      text-align: right;
-      line-height: 1.7;
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
     }
 
-    /* ─── FADE IN ─── */
-    .fade-up {
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
-    .fade-up.visible {
+    .reveal.visible {
       opacity: 1;
-      transform: none;
+      transform: translateY(0);
     }
 
-    .fade-up:nth-child(2) { transition-delay: 0.1s; }
-    .fade-up:nth-child(3) { transition-delay: 0.2s; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
 
-    /* ─── MOBILE ─── */
-    @media (max-width: 768px) {
-
-      /* Nav — hide links, keep logo */
-      .nav-links { display: none; }
-
-      nav { padding: 1.2rem 5vw; }
-
-      /* Hero */
-      #hero { padding: 0 5vw 8vh; }
-      .hero-h1 { font-size: clamp(2.2rem, 8vw, 3rem); max-width: 100%; }
-      .hero-sub { max-width: 100%; }
-
-      /* Section inner — reduce vertical padding */
-      .section-inner { padding: 5rem 5vw; }
-
-      /* Ce Suntem — single column */
-      .ce-suntem-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-      }
-      .ce-suntem-sticky { position: static; }
-
-      /* Cum Lucrăm — stack header, single column cards */
-      .cum-header {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
-      }
-      .cards { grid-template-columns: 1fr; }
-
-      /* Track Record — 2x2 grid */
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .stat-item + .stat-item {
-        border-left: none;
-        padding-left: 0;
-      }
-      .stat-item:nth-child(3),
-      .stat-item:nth-child(4) { border-top: 1px solid rgba(255,255,255,0.15); }
-
-      /* Doctrina */
-      #doctrina .section-inner { padding: 5rem 5vw; }
-      #doctrina blockquote { font-size: clamp(1.2rem, 4.5vw, 1.6rem); }
-
-      /* Contact — single column */
-      #contact .section-inner {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-      }
-
-      /* Footer */
-      .footer-meta { text-align: left; font-size: 0.65rem; }
-
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .stats-grid     { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+      .stat-item      { border-right: none; padding: 0; }
+      .why-grid       { grid-template-columns: 1fr; }
+      .programs-grid  { grid-template-columns: 1fr 1fr; }
+      .footer-top     { grid-template-columns: 1fr 1fr; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .section-desc   { text-align: left; max-width: 100%; }
+      .manifesto-sub  { grid-template-columns: 1fr; }
+      .cta-band-inner { grid-template-columns: 1fr; }
+      .nav-links      { display: none; }
     }
 
+    @media (max-width: 600px) {
+      .programs-grid { grid-template-columns: 1fr; }
+      .footer-top    { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<canvas id="webgl"></canvas>
-
-<!-- ─── NAV ─── -->
+<!-- ── NAV ── -->
 <nav id="nav">
-  <a class="nav-logo" href="#hero">UII</a>
+  <a href="#" class="nav-logo">U<span>II</span></a>
   <ul class="nav-links">
-    <li><a href="#ce-suntem">Ce suntem</a></li>
-    <li><a href="#cum-lucram">Cum lucrăm</a></li>
-    <li><a href="#track-record">Track record</a></li>
+    <li><a href="#why">Despre</a></li>
+    <li><a href="#programs">Programe</a></li>
+    <li><a href="#partners">Parteneri</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <a href="#contact" class="nav-cta">Colaborează</a>
 </nav>
 
-<!-- ─── HERO ─── -->
+<!-- ── HERO ── -->
 <section id="hero">
-  <div class="hero-eyebrow">Urban Innovation Institute</div>
-  <h1 class="hero-h1">Unde sistemele<br>urbane devin<br>acțiune.</h1>
-  <p class="hero-sub">Platforma independentă pentru inovare urbană sistemică — România &amp; Europa Centrală</p>
-  <a href="#ce-suntem" class="hero-cta">Descoperă</a>
-  <div class="scroll-line"></div>
+  <div class="mesh-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="hero-content">
+    <p class="hero-label">Urban Innovation Institute</p>
+    <h1>Orașe care<br><em>funcționează</em><br>pentru toți.</h1>
+    <p class="hero-sub">Cercetare aplicată, politici bazate pe date și parteneriate strategice pentru orașe mai echitabile, reziliente și funcționale.</p>
+    <div class="hero-actions">
+      <a href="#programs" class="btn-primary">Explorează programele</a>
+      <a href="#why" class="btn-ghost">Despre noi</a>
+    </div>
+  </div>
 </section>
 
-<!-- ─── CE SUNTEM ─── -->
-<section id="ce-suntem">
-  <div class="section-inner">
-    <div class="ce-suntem-grid">
-      <div class="ce-suntem-sticky fade-up">
-        <span class="section-label">Ce suntem</span>
-        <h2>Structura neutră<br>la intersecția<br>tuturor actorilor.</h2>
+<!-- ── STATS ── -->
+<section id="stats">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number" data-target="12">
+        <span class="count">0</span><span class="accent">+</span>
+      </div>
+      <div class="stat-label">Orașe partenere</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="47">
+        <span class="count">0</span>
+      </div>
+      <div class="stat-label">Proiecte active</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="6">
+        <span class="count">0</span>
+      </div>
+      <div class="stat-label">Ani de activitate</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="200">
+        <span class="count">0</span><span class="accent">+</span>
+      </div>
+      <div class="stat-label">Parteneri instituționali</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY UII ── -->
+<section id="why">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-index">01 — De ce UII</div>
+      <h2 class="section-title" style="margin-top:0.75rem">Complexitate sistemică,<br><em>claritate vizuală.</em></h2>
+    </div>
+    <p class="section-desc">Lucrăm la intersecția dintre date, politici publice și inovare urbană pentru a transforma modul în care orașele se dezvoltă.</p>
+  </div>
+
+  <div class="why-grid">
+    <div class="why-card reveal reveal-delay-1">
+      <div class="card-num">01</div>
+      <div class="card-title">Cercetare aplicată</div>
+      <p class="card-text">Nu producem rapoarte pentru sertare. Fiecare studiu este conceput cu o traiectorie clară spre implementare — în politici, în bugete, în planuri de urbanism.</p>
+    </div>
+    <div class="why-card reveal reveal-delay-2">
+      <div class="card-num">02</div>
+      <div class="card-title">Date deschise</div>
+      <p class="card-text">Transparența radicală este o condiție, nu o opțiune. Toate seturile de date, metodologiile și rezultatele intermediare sunt publice și reutilizabile.</p>
+    </div>
+    <div class="why-card reveal reveal-delay-1">
+      <div class="card-num">03</div>
+      <div class="card-title">Parteneriate strategice</div>
+      <p class="card-text">Lucrăm cu administrații locale, ONG-uri, universități și sectorul privat pentru că problemele urbane complexe nu au soluții unilaterale.</p>
+    </div>
+    <div class="why-card reveal reveal-delay-2">
+      <div class="card-num">04</div>
+      <div class="card-title">Impact măsurabil</div>
+      <p class="card-text">Fiecare proiect are indicatori clari de succes definiți la start. Evaluăm, raportăm, corectăm. Accountability-ul nu e negociabil.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROGRAMS ── -->
+<section id="programs">
+  <div class="programs-inner">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-index">02 — Programe</div>
+        <h2 class="section-title" style="margin-top:0.75rem">Arii de<br><em>intervenție.</em></h2>
+      </div>
+      <p class="section-desc">Șase domenii prioritare în care concentrăm resurse, expertiză și parteneriate.</p>
+    </div>
+
+    <div class="programs-grid">
+      <a href="#" class="program-card reveal reveal-delay-1">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="program-tag">Habitat</span>
+        <div class="program-name">Planificare urbană</div>
+        <p class="program-desc">Instrumente și metodologii pentru planificarea participativă a spațiului urban la scară locală și metropolitană.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+
+      <a href="#" class="program-card reveal reveal-delay-2">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <span class="program-tag">Climă</span>
+        <div class="program-name">Reziliență climatică</div>
+        <p class="program-desc">Strategii de adaptare la schimbările climatice pentru comunități urbane vulnerabile — de la infrastructură verde la planuri de urgență.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+
+      <a href="#" class="program-card reveal reveal-delay-3">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <span class="program-tag">Digital</span>
+        <div class="program-name">Civic Tech</div>
+        <p class="program-desc">Aplicații și platforme digitale pentru participare civică, transparență administrativă și acces la servicii publice.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+
+      <a href="#" class="program-card reveal reveal-delay-1">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span class="program-tag">Social</span>
+        <div class="program-name">Politici sociale</div>
+        <p class="program-desc">Cercetare și advocacy pentru servicii sociale echitabile, locuire accesibilă și incluziune în spațiul urban.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+
+      <a href="#" class="program-card reveal reveal-delay-2">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <span class="program-tag">Analiză</span>
+        <div class="program-name">Date & Analiză</div>
+        <p class="program-desc">Infrastructură de date urbane, tablouri de bord publice și metodologii de măsurare a impactului pentru decidenți.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+
+      <a href="#" class="program-card reveal reveal-delay-3">
+        <div class="program-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <span class="program-tag">Educație</span>
+        <div class="program-name">Formare & Capacitare</div>
+        <p class="program-desc">Programe de training pentru funcționari publici, activiști civici și profesioniști din domeniul urban.</p>
+        <span class="program-arrow">Află mai mult →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── MANIFESTO ── -->
+<section id="manifesto">
+  <div class="reveal">
+    <p class="manifesto-text">
+      Cele mai multe institute de cercetare produc
+      <strong>cunoaștere pentru cunoaștere.</strong>
+      Noi producem <strong>cunoaștere pentru <em>schimbare.</em></strong>
+    </p>
+    <div class="manifesto-rule"></div>
+    <div class="manifesto-sub">
+      <p class="manifesto-sub-text">Credem că un oraș mai bun nu este rezultatul unor decizii geniale luate de câțiva. Este rezultatul unor sisteme mai bune, care permit mai multor oameni să contribuie, să fie auziți și să trăiască decent.</p>
+      <div class="manifesto-cta-block">
+        <a href="#programs" class="btn-primary">Explorează programele</a>
+        <a href="#" class="btn-ghost">Descarcă raportul anual</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PARTNERS ── -->
+<section id="partners">
+  <div class="partners-inner reveal">
+    <p class="partners-label">Instituții și organizații partenere</p>
+    <div class="partners-strip">
+      <span class="partner-name">Primăria Cluj-Napoca</span>
+      <span class="partner-name">Primăria Timișoara</span>
+      <span class="partner-name">ONU-Habitat</span>
+      <span class="partner-name">Banca Mondială</span>
+      <span class="partner-name">UAUIM</span>
+      <span class="partner-name">Comisia Europeană</span>
+      <span class="partner-name">UNICEF România</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BAND ── -->
+<section id="cta-band">
+  <div class="cta-band-inner reveal">
+    <h2 class="cta-band-title">Lucrăm cu cei care vor să construiască orașe <span>mai bune.</span></h2>
+    <div class="cta-band-actions">
+      <a href="#contact" class="btn-white">Contactează-ne</a>
+      <a href="#" class="btn-outline-white">Vezi proiectele</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">Urban Innovation<br><span>Institute</span></div>
+        <p class="footer-tagline">Cercetare aplicată pentru orașe<br>mai echitabile și reziliente.</p>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Sistem operațional
+        </div>
       </div>
       <div>
-        <p class="fade-up">Urban Innovation Institute (UII) este o fundație independentă înregistrată în România, construită ca infrastructură de integrare sistemică pentru inovare urbană. Conectăm administrație publică, sector privat, academie, societate civilă și comunități — prin procese standardizate de co-design, diagnostic bazat pe date și mobilizare de capital strategic.</p>
-
-        <div class="not-list fade-up">
-          <div class="not-item">Nu suntem un think tank care produce rapoarte fără destinatar.</div>
-          <div class="not-item">Nu suntem o firmă de consultanță care optimizează doar pentru client.</div>
-          <div class="not-item">Nu suntem un ONG care militează fără instrumente de implementare.</div>
-        </div>
-
-        <div class="quote-block fade-up">
-          <p>Facem posibile conversații și decizii care altfel nu ar avea loc — și le transformăm în proiecte contractate, finanțate și livrate.</p>
-        </div>
+        <div class="footer-col-title">Institut</div>
+        <ul class="footer-links">
+          <li><a href="#">Despre noi</a></li>
+          <li><a href="#">Echipă</a></li>
+          <li><a href="#">Cariere</a></li>
+          <li><a href="#">Raport anual</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Programe</div>
+        <ul class="footer-links">
+          <li><a href="#">Planificare urbană</a></li>
+          <li><a href="#">Reziliență climatică</a></li>
+          <li><a href="#">Civic Tech</a></li>
+          <li><a href="#">Politici sociale</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="#">contact@uii.ro</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Twitter / X</a></li>
+          <li><a href="#">Newsletter</a></li>
+        </ul>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ─── CRACK ─── -->
-<div id="crack" style="height:120px; position:relative; z-index:1;"></div>
-
-<!-- ─── CUM LUCRĂM ─── -->
-<section id="cum-lucram">
-  <div class="section-inner">
-    <div class="cum-header">
-      <div class="fade-up">
-        <span class="section-label">Cum lucrăm</span>
-        <h2>Trei modalități<br>de colaborare.</h2>
-      </div>
-      <p class="cum-intro fade-up">Intervenim la niveluri diferite ale sistemului urban — de la strategie și finanțare europeană la implementare directă și parteneriate internaționale.</p>
-    </div>
-    <div class="cards">
-      <div class="service-card fade-up">
-        <span class="card-num">01</span>
-        <h3>Consultanță pentru Administrație Publică</h3>
-        <p>Consultanță tehnică și strategică pentru primării și ministere. Aplicații fonduri europene, New European Bauhaus, strategii smart city, design participativ și documentații tehnice.</p>
-        <div class="tags">
-          <span class="tag">Smart City</span>
-          <span class="tag">Fonduri UE</span>
-          <span class="tag">New European Bauhaus</span>
-          <span class="tag">Co-design</span>
-        </div>
-      </div>
-      <div class="service-card fade-up">
-        <span class="card-num">02</span>
-        <h3>Facilitare Consorții și Fonduri UE</h3>
-        <p>UII intră în consorții ca partener sau co-coordonator. Apeluri relevante: EUI Call 4, NEB Facility, URBACT IV, Interreg Danube, LIFE Programme. Angajamente pe 3–5 ani.</p>
-        <div class="tags">
-          <span class="tag">URBACT IV</span>
-          <span class="tag">Interreg Danube</span>
-          <span class="tag">LIFE</span>
-          <span class="tag">EUI</span>
-        </div>
-      </div>
-      <div class="service-card fade-up">
-        <span class="card-num">03</span>
-        <h3>Parteneriate Corporative Internaționale</h3>
-        <p>Market entry și navigare instituțională pentru corporații japoneze și europene în piața românească și CEE, sau pentru accesarea fondurilor europene prin parteneri locali.</p>
-        <div class="tags">
-          <span class="tag">Market Entry</span>
-          <span class="tag">Japonia</span>
-          <span class="tag">CEE</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── TRACK RECORD ─── -->
-<section id="track-record">
-  <div class="section-inner">
-    <div class="fade-up">
-      <span class="section-label">Track Record</span>
-      <h2>Rezultate măsurabile.</h2>
-    </div>
-    <div class="stats">
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="100" data-suffix="+">0</span>
-        <span class="stat-label">proiecte de spații publice și regenerare urbană livrate</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="3">0</span>
-        <span class="stat-label">niveluri de decizie acoperite: sector, municipiu, minister</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num" data-target="10">0</span>
-        <span class="stat-label">organizații japoneze în pipeline activ post-Osaka 2025</span>
-      </div>
-      <div class="stat-item fade-up">
-        <span class="stat-num">2025</span>
-        <span class="stat-label">reprezentare la Smart City Expo Barcelona și Osaka Expo</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── CRACK 2 ─── -->
-<div id="crack2" style="height:120px; position:relative; z-index:1;"></div>
-
-<!-- ─── DOCTRINA ─── -->
-<section id="doctrina">
-  <div class="section-inner">
-    <blockquote class="fade-up">
-      Nu competăm cu consultanțele, cu ONG-urile sau cu administrația publică. Competăm cu <em>absența unui mecanism de integrare</em>. Și în acel spațiu, nu avem competiție.
-    </blockquote>
-  </div>
-</section>
-
-<!-- ─── CRACK 3 ─── -->
-<div id="crack3" style="height:120px; position:relative; z-index:1;"></div>
-
-<!-- ─── CONTACT ─── -->
-<section id="contact">
-  <div class="section-inner">
-    <h2 class="contact-heading fade-up">Hai să construim<br>împreună.</h2>
-    <div class="contact-details">
-      <div class="contact-row fade-up">
-        <span class="label">Email</span>
-        <a href="mailto:contact@urbaninnovationinstitute.ro">contact@urbaninnovationinstitute.ro</a>
-      </div>
-      <div class="contact-row fade-up">
-        <span class="label">Website</span>
-        <a href="https://urbaninnovationinstitute.ro" target="_blank">urbaninnovationinstitute.ro</a>
-      </div>
-      <div class="contact-row fade-up">
-        <span class="label">Locație</span>
-        <span>București, România</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── FOOTER ─── -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-meta">
-      © 2026 Urban Innovation Institute Association | Tax ID 52883389 |
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Urban Innovation Institute. Toate drepturile rezervate.</span>
+      <span class="footer-copy">Conceput cu claritate.</span>
     </div>
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-  // ─── BRAND COLORS ───
-  const TEAL     = new THREE.Color('#1B5E5A');
-  const OFFWHITE = new THREE.Color('#F7F4EF');
-  const DARK_P   = new THREE.Color('#1A1A18');
-
-  // ─── RENDERER (uses existing canvas) ───
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    canvas: document.getElementById('webgl')
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  // ─── SCENE & CAMERA ───
-  const scene  = new THREE.Scene();
-  scene.background = OFFWHITE;
-  const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.z = 9;
-
-  // ─── LOGO (from logo.svg, viewBox 1024×1024) ───
-  const SVG_SCALE = 3.0 / 1024;
-  const SVG_CX = 512, SVG_CY = 512;
-  function sv(x, y) { return [(x - SVG_CX) * SVG_SCALE, -(y - SVG_CY) * SVG_SCALE]; }
-
-  const mat = new THREE.MeshBasicMaterial({ color: TEAL, side: THREE.DoubleSide });
-
-  // U body
-  const uShape = new THREE.Shape();
-  let p, cp1, cp2, ep;
-  p=sv(870.9,225.7); uShape.moveTo(p[0],p[1]);
-  p=sv(870.9,377.5); uShape.lineTo(p[0],p[1]);
-  p=sv(819.9,377.5); uShape.lineTo(p[0],p[1]);
-  cp1=sv(815.8,377.5); cp2=sv(803.8,387.4); ep=sv(805.8,393.7);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(800.1,503.2); cp2=sv(814.5,621.5); ep=sv(803.6,729.9);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(782.7,939.4); cp2=sv(572.4,1015.6); ep=sv(389.9,952.8);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(152.2,871.1); cp2=sv(235.6,585.1); ep=sv(220.2,393.9);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(220.2,387.4); cp2=sv(209.5,377.5); ep=sv(204.1,377.5);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  p=sv(156.4,377.5); uShape.lineTo(p[0],p[1]);
-  cp1=sv(155.7,377.5); cp2=sv(154.7,380.2); ep=sv(153.1,379.7);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  p=sv(153.1,225.7); uShape.lineTo(p[0],p[1]);
-  p=sv(342.9,225.7); uShape.lineTo(p[0],p[1]);
-  cp1=sv(366.4,225.7); cp2=sv(391.4,252.4); ep=sv(395.8,274.7);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(400.2,297.0); cp2=sv(398.0,335.2); ep=sv(398.3,361.2);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(399.5,465.7); cp2=sv(395.5,569.8); ep=sv(398.2,673.6);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(399.7,729.1); cp2=sv(411.5,779.7); ep=sv(471.5,797.6);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(550.6,821.2); cp2=sv(624.5,778.0); ep=sv(628.2,693.1);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  p=sv(628.4,279.0); uShape.lineTo(p[0],p[1]);
-  cp1=sv(630.5,254.1); cp2=sv(658.3,225.6); ep=sv(683.5,225.6);
-  uShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  p=sv(871.1,225.6); uShape.lineTo(p[0],p[1]);
-  uShape.closePath();
-
-  // Left dot
-  const dotLShape = new THREE.Shape();
-  p=sv(276.2,52.8); dotLShape.moveTo(p[0],p[1]);
-  cp1=sv(379.0,37.9); cp2=sv(389.5,182.2); ep=sv(303.3,194.8);
-  dotLShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(202.8,209.5); cp2=sv(189.7,65.4); ep=sv(276.2,52.8);
-  dotLShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  dotLShape.closePath();
-
-  // Right dot
-  const dotRShape = new THREE.Shape();
-  p=sv(722.9,52.8); dotRShape.moveTo(p[0],p[1]);
-  cp1=sv(826.0,37.8); cp2=sv(835.3,181.4); ep=sv(750.0,194.8);
-  dotRShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  cp1=sv(651.0,210.4); cp2=sv(635.3,65.5); ep=sv(722.9,52.8);
-  dotRShape.bezierCurveTo(cp1[0],cp1[1],cp2[0],cp2[1],ep[0],ep[1]);
-  dotRShape.closePath();
-
-  const uMesh    = new THREE.Mesh(new THREE.ShapeGeometry(uShape,    64), mat);
-  const dotLMesh = new THREE.Mesh(new THREE.ShapeGeometry(dotLShape, 32), mat);
-  const dotRMesh = new THREE.Mesh(new THREE.ShapeGeometry(dotRShape, 32), mat);
-
-  const logo = new THREE.Group();
-  logo.add(uMesh, dotLMesh, dotRMesh);
-  scene.add(logo);
-
-  // ─── PARTICLES ───
-  const COUNT = 1170;
-  const pos = new Float32Array(COUNT * 3);
-  const vel = new Float32Array(COUNT * 2);
-  const SX = 22, SY = 13;
-
-  for (let i = 0; i < COUNT; i++) {
-    pos[i*3]   = (Math.random() - 0.5) * SX;
-    pos[i*3+1] = (Math.random() - 0.5) * SY;
-    pos[i*3+2] = (Math.random() - 0.5) * 8 - 1;
-    vel[i*2]   = (Math.random() - 0.5) * 0.003;
-    vel[i*2+1] = (Math.random() - 0.5) * 0.003;
-  }
-
-  const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-
-  const pMat = new THREE.PointsMaterial({
-    color: DARK_P, size: 0.04, transparent: true, opacity: 0.22, sizeAttenuation: true
-  });
-  scene.add(new THREE.Points(pGeo, pMat));
-
-  // ─── CONSTELLATION LINES ───
-  const MAX_LINES = 700;
-  const linePos   = new Float32Array(MAX_LINES * 6); // 2 pts × 3 coords
-  const lineGeo   = new THREE.BufferGeometry();
-  lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-  lineGeo.setDrawRange(0, 0);
-  const lineMat = new THREE.LineBasicMaterial({ color: DARK_P, transparent: true, opacity: 0 });
-  const lineSegs = new THREE.LineSegments(lineGeo, lineMat);
-  scene.add(lineSegs);
-
-  let connectionPairs = [];
-  let regenTimer = 0;
-
-  function generateConnections() {
-    connectionPairs = [];
-    const SAMPLE = 130;
-    const DIST   = 2.2;  // world-unit distance threshold
-    const MAX_PER = 3;
-
-    // Pick random sample of particle indices
-    const sample = Array.from({ length: SAMPLE }, () => Math.floor(Math.random() * COUNT));
-
-    for (let a = 0; a < sample.length && connectionPairs.length < MAX_LINES; a++) {
-      const ia = sample[a];
-      const ax = pos[ia*3], ay = pos[ia*3+1];
-      const near = [];
-      for (let b = 0; b < sample.length; b++) {
-        if (b === a) continue;
-        const ib = sample[b];
-        const dx = pos[ib*3] - ax, dy = pos[ib*3+1] - ay;
-        const d = Math.sqrt(dx*dx + dy*dy);
-        if (d < DIST) near.push({ ib, d });
-      }
-      near.sort((x, y) => x.d - y.d);
-      for (let k = 0; k < Math.min(MAX_PER, near.length); k++) {
-        if (connectionPairs.length < MAX_LINES) connectionPairs.push([ia, near[k].ib]);
-      }
-    }
-  }
-
-  // ─── SCROLL-DRIVEN ANIMATION ───
-  let autoRot    = 0;
-  let currentRot = 0;
-  let targetRot  = 0;
-  let canvasOpacity = 1;
-  let wheelImpulse = 0;
-
-  // ─── CRACK SPRING ───
-  const CRACK_REST   = 120;  // px
-  const CRACK_MAX    = 100;  // px max expansion
-  const CRACK_MIN    = -120; // px min (fully closed)
-  const crackIds     = ['crack', 'crack2'];
-  let crackVelocity  = 0;
-  let crackOffset    = 0;
-  let crackTarget    = 0;
-
-  // crack3 has its own spring — seals shut when #contact is in view
-  let c3Velocity = 0;
-  let c3Offset   = 0;
-  let c3Target   = 0;
-
-  // Shared handler — called by both wheel and touch
-  function applyScrollImpulse(deltaY) {
-    const prev = wheelImpulse;
-    wheelImpulse += Math.abs(deltaY) * 0.000012;
-    if (prev < 0.005 || regenTimer > 25) { generateConnections(); regenTimer = 0; }
-    crackTarget = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackTarget + deltaY * 0.18));
-    const contactEl = document.getElementById('contact');
-    if (contactEl && contactEl.getBoundingClientRect().top < window.innerHeight) {
-      c3Target = Math.max(CRACK_MIN, c3Target - Math.abs(deltaY) * 0.28);
-    } else {
-      c3Target = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Target + deltaY * 0.18));
-    }
-  }
-
-  window.addEventListener('wheel', (e) => {
-    applyScrollImpulse(e.deltaY);
-  }, { passive: true });
-
-  // ─── TOUCH — drive same effects on mobile swipe ───
-  let touchStartY = 0;
-  let touchLastY  = 0;
-  window.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-    touchLastY  = touchStartY;
-  }, { passive: true });
-  window.addEventListener('touchmove', (e) => {
-    const y     = e.touches[0].clientY;
-    const delta = (touchLastY - y) * 2.2; // invert: swipe up = scroll down
-    touchLastY  = y;
-    applyScrollImpulse(delta);
-  }, { passive: true });
-
+  // Nav scroll
+  const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
-    const heroH = window.innerHeight;
-    const sy    = window.scrollY;
-    targetRot   = (sy / heroH) * Math.PI * 1.8;
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
 
-    // Base fade: 0 by the time hero is scrolled past
-    const heroFade = Math.max(0, 1 - sy / heroH * 1.4);
-
-    // Crack peek: restore opacity when any crack gap is in the viewport
-    function crackPeek(id) {
-      const el = document.getElementById(id);
-      if (!el) return 0;
-      const r = el.getBoundingClientRect();
-      const dist = Math.abs((r.top + r.height / 2) - heroH / 2);
-      return Math.max(0, 1 - dist / (heroH * 0.55));
-    }
-    const crackPeak = Math.max(crackPeek('crack'), crackPeek('crack2'), crackPeek('crack3'));
-
-    canvasOpacity = Math.max(heroFade, crackPeak * 0.85);
-    document.getElementById('webgl').style.opacity = canvasOpacity;
-
-    // Nav style
-    document.getElementById('nav').classList.toggle('scrolled', sy > 60);
-  });
-
-  // ─── RESIZE ───
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  // ─── RENDER LOOP ───
-  function tick() {
-    requestAnimationFrame(tick);
-
-    autoRot  += 0.0018;
-    currentRot += (targetRot - currentRot) * 0.06;
-    logo.rotation.y = autoRot + currentRot;
-
-    const s = Math.max(0.85, Math.min(1.5, 1 + currentRot * 0.12));
-    logo.scale.setScalar(s);
-
-    wheelImpulse *= 0.90;
-    if (wheelImpulse > 0.001) regenTimer++;
-
-    // ─── CRACK SPRING ───
-    // shared crack spring (crack, crack2)
-    crackTarget  *= 0.88;
-    const spring  = (crackTarget - crackOffset) * 0.09;
-    const damper  = crackVelocity * 0.72;
-    crackVelocity = crackVelocity + spring - damper;
-    crackOffset   = Math.max(CRACK_MIN, Math.min(CRACK_MAX, crackOffset + crackVelocity));
-    const crackH  = Math.max(0, Math.round(CRACK_REST + crackOffset)) + 'px';
-    for (const id of crackIds) {
-      const el = document.getElementById(id);
-      if (el) el.style.height = crackH;
-    }
-
-    // crack3 spring — seals shut when #contact is reached
-    const contactVisible = (() => {
-      const el = document.getElementById('contact');
-      return el && el.getBoundingClientRect().top < window.innerHeight;
-    })();
-    c3Target *= contactVisible ? 0.94 : 0.88; // slower decay when sealing (stays closed longer)
-    const s3 = (c3Target - c3Offset) * 0.09;
-    const d3 = c3Velocity * 0.72;
-    c3Velocity = c3Velocity + s3 - d3;
-    c3Offset   = Math.max(CRACK_MIN, Math.min(CRACK_MAX, c3Offset + c3Velocity));
-    const c3H  = document.getElementById('crack3');
-    if (c3H) c3H.style.height = Math.max(0, Math.round(CRACK_REST + c3Offset)) + 'px';
-
-    const cap = 0.018;
-    for (let i = 0; i < COUNT; i++) {
-      vel[i*2]   += (Math.random() - 0.5) * wheelImpulse;
-      vel[i*2+1] += (Math.random() - 0.5) * wheelImpulse;
-      vel[i*2]    = Math.max(-cap, Math.min(cap, vel[i*2]));
-      vel[i*2+1]  = Math.max(-cap, Math.min(cap, vel[i*2+1]));
-      pos[i*3]   += vel[i*2];
-      pos[i*3+1] += vel[i*2+1];
-      if (pos[i*3]   >  SX/2) pos[i*3]   = -SX/2;
-      if (pos[i*3]   < -SX/2) pos[i*3]   =  SX/2;
-      if (pos[i*3+1] >  SY/2) pos[i*3+1] = -SY/2;
-      if (pos[i*3+1] < -SY/2) pos[i*3+1] =  SY/2;
-    }
-    pGeo.attributes.position.needsUpdate = true;
-
-    // Update constellation lines
-    const lineOpacity = Math.min(1, wheelImpulse * 120) * 0.38;
-    lineMat.opacity = lineMat.opacity + (lineOpacity - lineMat.opacity) * 0.12;
-    if (lineMat.opacity > 0.005 && connectionPairs.length > 0) {
-      let lc = 0;
-      for (const [ia, ib] of connectionPairs) {
-        if (lc >= MAX_LINES) break;
-        linePos[lc*6]   = pos[ia*3];   linePos[lc*6+1] = pos[ia*3+1]; linePos[lc*6+2] = pos[ia*3+2];
-        linePos[lc*6+3] = pos[ib*3];   linePos[lc*6+4] = pos[ib*3+1]; linePos[lc*6+5] = pos[ib*3+2];
-        lc++;
-      }
-      lineGeo.setDrawRange(0, lc * 2);
-      lineGeo.attributes.position.needsUpdate = true;
-    } else {
-      lineGeo.setDrawRange(0, 0);
-    }
-
-    renderer.render(scene, camera);
+  // Counter animation
+  function animateCount(el, target, duration = 1400) {
+    const start = performance.now();
+    const update = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(ease * target);
+      if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
   }
 
-  tick();
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('[data-target]').forEach(item => {
+          animateCount(item.querySelector('.count'), parseInt(item.dataset.target));
+        });
+        statsObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
 
-  // ─── FADE-IN ON SCROLL ───
-  const observer = new IntersectionObserver((entries) => {
+  const statsEl = document.getElementById('stats');
+  if (statsEl) statsObserver.observe(statsEl);
+
+  // Scroll reveals
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  // ─── ANIMATED COUNTERS ───
-  const counterObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el     = entry.target;
-      const target = parseInt(el.dataset.target);
-      const suffix = el.dataset.suffix || '';
-      let start = null;
-      const duration = 1400;
-      const step = (ts) => {
-        if (!start) start = ts;
-        const prog = Math.min((ts - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - prog, 3);
-        el.textContent = Math.floor(ease * target) + (prog === 1 ? suffix : '');
-        if (prog < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-      counterObs.unobserve(el);
-    });
-  }, { threshold: 0.5 });
-
-  document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObs.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 </script>
+
 </body>
 </html>
